@@ -1,0 +1,120 @@
+{% extends "../base.html" %}
+{% load static %}
+{% block title %}Basket{% endblock %}
+
+{% block content %}
+<div class="container">
+    <main class="pt-5">
+        {% for item in basket  %}
+        {% with product=item.product  %}
+        <div class="row g-3 product-list" data-index="{{product.id}}">
+            <div class="col-md-5 col-lg-5 order-md-first bg-light">
+                <img class="img-fluid mx-auto d-block" width="200px" alt="Responsive image" src="{{ product.image.url }}">
+            </div>
+            <div class="col-md-7 col-lg-7 ps-md-3 ps-lg-5">
+                <h1 class="mb-0 h4">{{ product.title }}</h1>
+                <p><span class="lead">{{ product.authur }}</span>(author)</p>
+                <p>{{product.description|slice:":355"}}...</P>
+                    
+                <div class="border">
+                    <div class="col border-bottom">
+                        <div class="row p-3">
+                            <div class="col-6">Hardback</div>
+                            <div class="col-6 text-end"><span class="h4 fw bold total" id="{{product.id}}">Rs.{{item.total_price}}</span></div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="row p-3">
+                            <div class="col-6">
+                                <label for="select">Qty</label>
+                                <select id="select{{product.id}}">
+                                    <default option>{{item.qty}}</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>                                    
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                </select>
+
+                            </div>
+                            <div class="col-6 text-end"><button type="button" class="btn btn-primary btn-sm update-basket" data-index="{{product.id}}">Update
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm del-from-basket" data-index="{{product.id}}">Delete
+                            </button>
+                            </div>
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+           
+        </div>
+         <div class=" text-end" >
+           <span style="text style:bold">Subtotal <button type="button" class="btn btn-secondary btn-sm" id="subtotal" value="">Rs.{{basket.total_product_price}}
+            </button></span>
+          
+         <a href="{% url 'payment:payment_summary' %}" class="btn btn-primary my-2">Proceed to Pay</a>
+        </div>
+         {% endfor %}
+    </main>
+</div>
+<script>
+    $(document).on('click', '.del-from-basket', function (e) {
+        e.preventDefault();
+        var proid = $(this).data('index');
+        $.ajax({
+            type:'POST',
+            url: '{% url "basket:basket_delete" %}',
+            data:{
+                productid: $(this).data('index'),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action:'post'
+            },
+            success: function (json) {
+                document.getElementById("cart-count").innerHTML = json.qty
+                $('.product-list[data-index="'+proid+'"]').remove()
+                document.getElementById("subtotal").innerHTML = json.subtotal
+                
+
+            },
+            error: function (xhr, errmsg, err) {
+
+            }
+        });
+    })
+    $(document).on('click', '.update-basket', function (e) {
+        e.preventDefault();
+        var proid = $(this).data('index');
+        $.ajax({
+            type:'POST',
+            url: '{% url "basket:basket_update" %}',
+            data:{
+                productid: $(this).data('index'),
+                productqty: $('#select'+proid+' option:selected').text(),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action:'post'
+            },
+            success: function (json) {
+                document.getElementById("cart-count").innerHTML = json.qty
+                document.getElementById("subtotal").innerHTML = json.subtotal
+                document.getElementById(proid).innerHTML = json.total
+                    
+                
+
+            },
+            error: function (xhr, errmsg, err) {
+
+            }
+        });
+    })
+</script>
+{% endblock %}

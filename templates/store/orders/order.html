@@ -1,0 +1,37 @@
+{% extends '../base.html' %}
+{% block title %}Orders{% endblock  %}
+{% block content %}
+
+<div class="container">
+    <div class="row mt-5">
+        <div class="text-center mb-5"><h1>All Orders</h1></div>
+        <table class="table">
+            <tr>
+                    <th>Orderid</th>
+                    <th>Product</th>
+                    <th>Amount</th>
+                    <th>Address</th>
+                </tr>
+                {% for order in order %}
+                <tr>
+                    <td>{{order.order_key}}</td>
+                    <td>
+                        
+                        <p>
+                        {{product.product}}{{quantity}}</p>
+                        
+                        
+                    </td>
+                    <td>{{order.amount}}</td>
+                    <td>{{address.first_name}}
+                        {{address.address}}<br />
+                        {{address.city}}
+                        {{address.state}}
+                        {{address.postcode}}
+                    </td>
+                </tr>
+                {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock  %}
